@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:quizzler/QuestionBank.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 void main() => runApp(Quizzler());
 
@@ -25,6 +27,37 @@ class QuizPage extends StatefulWidget {
 }
 
 class _QuizPageState extends State<QuizPage> {
+  QuestionBank qb = QuestionBank();
+
+  List<Icon> ico = [];
+
+  void checkAnswer(bool option) {
+    setState(() {
+      if (!qb.endOfQuestions()) {
+        if (option == qb.getAnswer()) {
+          ico.add(Icon(
+            Icons.check,
+            color: Colors.green,
+          ));
+        } else {
+          ico.add(Icon(
+            Icons.close,
+            color: Colors.red,
+          ));
+        }
+        qb.nextQuestion();
+      } else {
+        Alert(
+          context: context,
+          title: 'Hello',
+          desc: "Thank you for playing, Game Over",
+        ).show();
+        qb.qno = 0;
+        ico = [];
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -37,7 +70,7 @@ class _QuizPageState extends State<QuizPage> {
             padding: EdgeInsets.all(10.0),
             child: Center(
               child: Text(
-                'This is where the question text will go.',
+                qb.getQuestion(),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 25.0,
@@ -61,6 +94,7 @@ class _QuizPageState extends State<QuizPage> {
                 ),
               ),
               onPressed: () {
+                checkAnswer(true);
                 //The user picked true.
               },
             ),
@@ -79,12 +113,13 @@ class _QuizPageState extends State<QuizPage> {
                 ),
               ),
               onPressed: () {
+                checkAnswer(false);
                 //The user picked false.
               },
             ),
           ),
         ),
-        //TODO: Add a Row here as your score keeper
+        Row(children: ico)
       ],
     );
   }
